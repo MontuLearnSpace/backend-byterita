@@ -1,21 +1,23 @@
-// src/pages/Login.jsx
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: '', password: '' });
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', form);
       localStorage.setItem('token', res.data.token);
-      alert('Login berhasil');
+      alert('Login berhasil!');
+      navigate('/dashboard');
     } catch (err) {
-      alert('Login gagal');
+      alert('Login gagal. Username atau password salah.');
     }
   };
 
@@ -53,14 +55,14 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="font-semibold text-sm">Email</label>
+              <label className="font-semibold text-sm">Username</label>
               <input
-                type="email"
-                name="email"
-                value={form.email}
+                type="text"
+                name="username"
+                value={form.username}
                 onChange={handleChange}
                 className="w-full border px-4 py-2 rounded mt-1 text-sm"
-                placeholder="Enter Your Email Address"
+                placeholder="Masukkan Username"
                 required
               />
             </div>
@@ -73,7 +75,7 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
                 className="w-full border px-4 py-2 rounded mt-1 text-sm"
-                placeholder="Enter Your Password"
+                placeholder="Masukkan Password"
                 required
               />
             </div>
@@ -100,4 +102,3 @@ const Login = () => {
 };
 
 export default Login;
-

@@ -1,24 +1,26 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // tambahkan useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Register = () => {
-  const navigate = useNavigate(); // inisialisasi navigator
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: '', password: '' });
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:5000/api/auth/register', {
-        username: form.name,
+        username: form.username,
         password: form.password,
         role: 'user'
       });
       alert('Register berhasil!');
+      navigate('/login');
     } catch (err) {
-      alert('Register gagal!');
+      alert('Register gagal.');
     }
   };
 
@@ -34,12 +36,12 @@ const Register = () => {
           </div>
         </div>
         <img src="/login-illustration.png" alt="Ilustrasi" className="w-[65%] mt-32" />
-        <button
-          onClick={() => navigate('/')}
+        <Link
+          to="/"
           className="mt-8 px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded shadow text-sm font-medium"
         >
           Kembali Ke Beranda
-        </button>
+        </Link>
       </div>
 
       {/* Kanan */}
@@ -56,21 +58,29 @@ const Register = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="font-semibold text-sm">Name</label>
-              <input type="text" name="name" value={form.name} onChange={handleChange}
-                className="w-full border px-4 py-2 rounded mt-1 text-sm" placeholder="Enter Your Full Name" required />
-            </div>
-
-            <div>
-              <label className="font-semibold text-sm">Email</label>
-              <input type="email" name="email" value={form.email} onChange={handleChange}
-                className="w-full border px-4 py-2 rounded mt-1 text-sm" placeholder="Enter Your Email Address" required />
+              <label className="font-semibold text-sm">Username</label>
+              <input
+                type="text"
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded mt-1 text-sm"
+                placeholder="Masukkan Username"
+                required
+              />
             </div>
 
             <div>
               <label className="font-semibold text-sm">Password</label>
-              <input type="password" name="password" value={form.password} onChange={handleChange}
-                className="w-full border px-4 py-2 rounded mt-1 text-sm" placeholder="At least 8 characters" required />
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded mt-1 text-sm"
+                placeholder="Minimal 8 karakter"
+                required
+              />
             </div>
 
             <div className="flex items-center space-x-2 text-sm">
@@ -85,7 +95,7 @@ const Register = () => {
 
           <div className="mt-6 text-center text-sm">
             <p>
-              Already have an account? <Link to="/login" className="font-bold">Log in</Link>
+              Sudah punya akun? <Link to="/login" className="font-bold">Log in</Link>
             </p>
           </div>
         </div>
