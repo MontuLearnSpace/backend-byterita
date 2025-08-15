@@ -1,73 +1,99 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../components/Navbar'; // Navbar reusable
+import Navbar from '../components/Navbar';
 
 const HomePage = () => {
-  const [berita, setBerita] = useState([]);
+  const [beritaUtama, setBeritaUtama] = useState(null);
+  const [beritaPopuler, setBeritaPopuler] = useState([]);
+  const [beritaLain, setBeritaLain] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/berita')
-      .then(res => setBerita(res.data))
-      .catch(err => console.error('Gagal ambil berita:', err));
-  }, []);
+    // Ambil berita utama
+    axios.get('http://localhost:5000/api/berita-utama')
+      .then(res => setBeritaUtama(res.data))
+      .catch(err => console.error('Gagal ambil berita utama:', err));
 
-  const kategoriMap = berita.reduce((acc, item) => {
-    const kategori = item.kategori || 'Lainnya';
-    if (!acc[kategori]) acc[kategori] = [];
-    acc[kategori].push(item);
-    return acc;
-  }, {});
+    // Ambil berita populer
+    axios.get('http://localhost:5000/api/berita-populer')
+      .then(res => setBeritaPopuler(res.data))
+      .catch(err => console.error('Gagal ambil berita populer:', err));
+
+    // Ambil semua berita, filter selain berita utama
+    axios.get('http://localhost:5000/api/berita')
+      .then(res => {
+        const allBerita = res.data;
+        if (allBerita.length > 0 && beritaUtama) {
+          const filtered = allBerita.filter(b => b.id !== beritaUtama.id);
+          setBeritaLain(filtered);
+        } else {
+          setBeritaLain(allBerita);
+        }
+      })
+      .catch(err => console.error('Gagal ambil berita lainnya:', err));
+  }, [beritaUtama]);
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Hero Berita Utama */}
-      <section className="px-6 py-8 max-w-screen-lg mx-auto w-full">
-        <div className="bg-gray-100 rounded overflow-hidden shadow">
-          <div className="w-full aspect-video overflow-hidden">
-            <img src="/hero-berita.jpg" alt="Hero" className="object-cover w-full h-full" />
-          </div>
-          <div className="p-4">
-            <h2 className="text-2xl font-bold mb-2">Judul Berita Utama</h2>
-            <p className="text-sm text-gray-600">
-              Keterangan singkat tentang berita... Keterangan singkat tentang berita...
-            </p>
-          </div>
-        </div>
-      </section>
+      <div className="max-w-screen-lg mx-auto px-4 py-8 space-y-10">
 
-      {/* Daftar Berita Per Kategori */}
-      <section className="px-6 pb-20 max-w-screen-lg mx-auto w-full">
-        {Object.entries(kategoriMap).map(([kategori, items]) => (
-          <div key={kategori} className="mb-10">
-            <h3 className="text-xl font-bold mb-4">{kategori}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {items.map(item => (
-                <div key={item.id} className="border rounded overflow-hidden shadow hover:shadow-md transition">
-                  <Link to={`/berita/${item.id}`} className="block w-full aspect-video overflow-hidden">
-                    <img
-                      src={item.gambar || '/sample-thumb.jpg'}
-                      alt={item.judul}
-                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
-                    />
-                  </Link>
-                  <div className="p-4">
-                    <h4 className="font-semibold text-lg">{item.judul}</h4>
-                    <p className="text-sm text-gray-600 mb-2">{item.isi?.slice(0, 80)}...</p>
-                    <Link to={`/berita/${item.id}`} className="text-cyan-600 hover:underline text-sm">
-                      Lihat Detail →
-                    </Link>
-                  </div>
-                </div>
+        {/* SECTION: BERITA UTAMA + POPULER */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* BERITA UTAMA */}
+          {beritaUtama && (
+            <div className="md:col-span-2 flex flex-col md:flex-row gap-4">
+              <img
+                src={beritaUtama.gambar || '/sample-thumb.jpg'}
+                alt={beritaUtama.judul}
+                className="w-full md:w-1/2 h-auto object-cover rounded"
+              />
+              <div>
+                <Link to={`/berita/${beritaUtama.id}`}>
+                  <h2 className="text-2xl font-bold hover:text-cyan-700">{beritaUtama.judul}</h2>
+                </Link>
+                <p className="text-sm text-red-600 mt-1">{beritaUtama.kategori}</p>
+                <p className="mt-2 text-gray-600 text-sm">
+                  {beritaUtama.isi?.slice(0, 220)}...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* BERITA POPULER */}
+          <div>
+            <h3 className="text-lg font-bold border-b pb-2 mb-4">MOST POPULAR</h3>
+            <div className="space-y-4 max-h-[300px] overflow-y-auto">
+              {beritaPopuler.map((item, index) => (
+                <Link to={`/berita/${item.id}`} key={item.id} className="block">
+                  <p className="text-gray-800 text-sm font-semibold">
+                    {String(index + 1).padStart(2, '0')}. {item.judul}
+                  </p>
+                  <p className="text-xs text-red-600">{item.kategori}</p>
+                </Link>
               ))}
             </div>
           </div>
-        ))}
-      </section>
+        </div>
 
-      {/* Footer */}
+        {/* SECTION: HEADLINES / BERITA LAINNYA */}
+        <div>
+          <h3 className="text-xl font-bold mb-4 border-b pb-2">HEADLINES</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {beritaLain.map(item => (
+              <Link to={`/berita/${item.id}`} key={item.id} className="block">
+                <img src={item.gambar || '/sample-thumb.jpg'} className="w-full h-32 object-cover rounded" />
+                <p className="text-sm mt-2 font-semibold hover:text-cyan-600">{item.judul}</p>
+                <p className="text-xs text-red-600">{item.kategori}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* FOOTER */}
       <footer className="bg-yellow-100 px-6 py-6 text-sm text-gray-600 mt-auto">
         <div className="flex flex-col md:flex-row md:justify-between gap-8 items-start">
           <div className="flex items-center gap-6">
@@ -78,11 +104,6 @@ const HomePage = () => {
               <a href="#"><i className="fab fa-youtube"></i></a>
               <a href="#"><i className="fab fa-instagram"></i></a>
             </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
           </div>
         </div>
       </footer>

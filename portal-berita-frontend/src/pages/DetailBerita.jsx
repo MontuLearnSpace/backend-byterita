@@ -11,15 +11,17 @@ const DetailBerita = () => {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
+    // Ambil detail berita
     axios.get(`http://localhost:5000/api/berita/${id}`)
       .then(res => setBerita(res.data))
       .catch(err => console.error('Gagal ambil detail berita:', err));
 
-    setListKomentar([
-      { nama: 'User A', tanggal: '20 Juni 2025', isi: 'Ini adalah komentar pertama' },
-      { nama: 'User B', tanggal: '21 Juni 2025', isi: 'Komentar kedua tentang berita ini' },
-    ]);
+    // Ambil komentar dari backend
+    axios.get(`http://localhost:5000/api/komentar/${id}`)
+      .then(res => setListKomentar(res.data))
+      .catch(err => console.error('Gagal ambil komentar:', err));
 
+    // Cek status login
     const token = localStorage.getItem('token');
     setIsLogin(!!token);
   }, [id]);
@@ -46,7 +48,7 @@ const DetailBerita = () => {
 
       <main className="max-w-screen-md mx-auto px-6 py-12 w-full">
         <h1 className="text-3xl font-bold mb-4">{berita.judul}</h1>
-        <p className="text-sm text-gray-500 mb-2">Tanggal Publikasi, Diposting Oleh: Admin</p>
+        <p className="text-sm text-gray-500 mb-2">Diposting pada: {new Date(berita.tanggal).toLocaleDateString('id-ID')} oleh Admin</p>
         <div className="aspect-video overflow-hidden mb-6">
           <img
             src={berita.gambar || "/hero-berita.jpg"}
@@ -97,6 +99,7 @@ const DetailBerita = () => {
         </div>
       </main>
 
+      {/* Footer hanya logo dan sosmed */}
       <footer className="bg-yellow-100 px-6 py-6 text-sm text-gray-600 mt-auto">
         <div className="flex flex-col md:flex-row md:justify-between gap-8 items-start">
           <div className="flex items-center gap-6">
@@ -107,11 +110,6 @@ const DetailBerita = () => {
               <a href="#"><i className="fab fa-youtube"></i></a>
               <a href="#"><i className="fab fa-instagram"></i></a>
             </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
-            <div className="space-y-1"><p className="font-medium">Topic</p><p>Page</p><p>Page</p></div>
           </div>
         </div>
       </footer>

@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -23,36 +22,50 @@ const Navbar = () => {
   };
 
   return (
-    <header className="flex items-center justify-between px-6 py-8 bg-yellow-100 shadow relative">
+    <header className="flex items-center justify-between px-6 py-4 bg-yellow-100 shadow relative">
+      {/* Kiri: Logo */}
       <div className="flex items-center gap-2">
-        <img src="/byterita-logo.png" alt="Logo" className="w-16" />
+        <img src="/byterita-logo.png" alt="Logo" className="w-12" />
         <span className="text-2xl font-semibold text-cyan-600">Byterita</span>
       </div>
 
-      <div className="flex-1 mx-8">
-        <input type="text" placeholder="Penelusuran" className="w-full border rounded px-4 py-1" />
-      </div>
+      {/* Tengah: Kategori */}
+      <nav className="hidden md:flex gap-4 text-sm font-medium">
+        <button onClick={() => navigate('/')} className="hover:text-cyan-700">Beranda</button>
+        <button onClick={() => navigate('/kategori/Teknologi')} className="hover:text-cyan-700">Teknologi</button>
+        <button onClick={() => navigate('/kategori/Digital')} className="hover:text-cyan-700">Digital</button>
+        <button onClick={() => navigate('/kategori/Media%20Sosial')} className="hover:text-cyan-700">Media Sosial</button>
+        <button onClick={() => navigate('/kategori/Cyberpolitik')} className="hover:text-cyan-700">Cyberpolitik</button>
+        <button onClick={() => navigate('/kategori/Ekonomi')} className="hover:text-cyan-700">Ekonomi</button>
+      </nav>
 
-      <div className="flex gap-2 items-center relative">
-        <button onClick={() => navigate('/')} className="bg-yellow-300 hover:bg-yellow-400 px-4 py-1 rounded">
-          Beranda
-        </button>
+      {/* Kanan: Pencarian + Login/User */}
+      <div className="flex items-center gap-3">
+        <input
+          type="text"
+          placeholder="Penelusuran"
+          className="text-sm px-3 py-1 border rounded w-40"
+        />
 
         {!isLogin ? (
-          <button onClick={() => navigate('/login')} className="bg-black text-white px-4 py-1 rounded">
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-black text-white text-sm px-3 py-1 rounded hover:bg-gray-800"
+          >
             Login
           </button>
         ) : (
           <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="bg-cyan-600 text-white px-4 py-1 rounded"
-            >
-              ☰
+            <button onClick={toggleDropdown}>
+              <img
+                src="/user-icon.png"
+                alt="User"
+                className="w-8 h-8 rounded-full bg-white"
+              />
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md z-50">
+              <div className="absolute right-0 mt-2 w-40 bg-white text-black border rounded shadow-md z-50">
                 <button
                   onClick={() => {
                     navigate('/admin/dashboard');

@@ -15,7 +15,7 @@ const Login = () => {
       const res = await axios.post('http://localhost:5000/api/auth/login', form);
       localStorage.setItem('token', res.data.token);
       alert('Login berhasil!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       alert('Login gagal. Username atau password salah.');
     }
